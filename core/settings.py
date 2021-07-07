@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'marketing',
     'tinymce',
     'crispy_forms',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -139,10 +140,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static_in_env')
 ]
 
-VENV_PATH = os.path.dirname(BASE_DIR)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(VENV_PATH, 'media_root')
+# VENV_PATH = os.path.dirname(BASE_DIR)
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(VENV_PATH, 'media_root')
 
 
 TINYMCE_DEFAULT_CONFIG = {
@@ -169,7 +170,16 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+AWS_ACCESS_KEY_ID=config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY=config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME=config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_CUSTOM_DOMAIN=config('AWS_S3_CUSTOM_DOMAIN')
+AWS_S3_OBJECT_PARAMETERS={"CacheControl":"max-age=86400"}
+AWS_DEFAULT_ACL=config('AWS_DEFAULT_ACL')
+AWS_LOCATION=config('AWS_LOCATION')
+STATICFILES_STORAGE="storages.backends.s3boto3.S3Boto3Storage"
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 import dj_database_url 
 prod_db  =  dj_database_url.config(conn_max_age=500)
